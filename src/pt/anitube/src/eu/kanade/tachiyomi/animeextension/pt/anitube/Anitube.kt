@@ -33,7 +33,7 @@ class Anitube : ConfigurableAnimeSource, ParsedAnimeHttpSource() {
 
     override val name = "Anitube"
 
-    override val baseUrl = "https://www.anitube.vip"
+    override val baseUrl = "https://www.anitube.us"
 
     override val lang = "pt-BR"
 
@@ -199,13 +199,16 @@ class Anitube : ConfigurableAnimeSource, ParsedAnimeHttpSource() {
             }
             .build()
 
+        val client = OkHttpClient()
+
+        val ads = client.newCall(GET("https://widgets.outbrain.com/outbrain.js", headers))
+            .execute()
+
         val form = FormBody.Builder()
             .add("category", "client")
             .add("type", "premium")
-            .add("ad", "window.isAdblockActive = false;")
+            .add("ad", ads.body.string())
             .build()
-
-        val client = OkHttpClient()
 
         val response = client
             .newCall(POST(url = "https://ads.anitube.vip", headers = headers, body = form))
