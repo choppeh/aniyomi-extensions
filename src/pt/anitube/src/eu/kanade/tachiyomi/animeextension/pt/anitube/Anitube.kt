@@ -33,7 +33,7 @@ class Anitube : ConfigurableAnimeSource, ParsedAnimeHttpSource() {
 
     override val name = "Anitube"
 
-    override val baseUrl = "https://www.anitube.us"
+    override val baseUrl = "https://www.anitube.vip"
 
     override val lang = "pt-BR"
 
@@ -119,7 +119,7 @@ class Anitube : ConfigurableAnimeSource, ParsedAnimeHttpSource() {
         val infos = content.selectFirst("div.anime_infos")!!
 
         title = doc.selectFirst("div.anime_container_titulo")!!.text()
-        thumbnail_url = content.selectFirst("img")?.attr("src")
+        thumbnail_url = content.selectFirst("img")?.imgAttr()
         genre = infos.getInfo("Gêneros")
         author = infos.getInfo("Autor")
         artist = infos.getInfo("Estúdio")
@@ -133,6 +133,14 @@ class Anitube : ConfigurableAnimeSource, ParsedAnimeHttpSource() {
                 infos.getInfo(item)?.also { append("\n$item: $it") }
             }
         }
+    }
+
+    fun Element.imgAttr(): String = when {
+        hasAttr("data-cfsrc") -> absUrl("data-cfsrc")
+        hasAttr("data-lazy-src") -> absUrl("data-lazy-src")
+        hasAttr("data-src") -> absUrl("data-src").substringBefore(" ")
+        hasAttr("srcset") -> absUrl("srcset").substringBefore(" ")
+        else -> absUrl("src")
     }
 
     // ============================== Episodes ==============================
